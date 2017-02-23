@@ -1,0 +1,89 @@
+const
+  uuid = require('node-uuid')
+  , dl = require('debug')('dbmodles:log')
+  , de = require('debug')('dbmodles:error')
+  , config = require('../config')
+  , Sequelize = require('sequelize')
+  ;
+
+module.exports = (sequelize)=>{
+<%
+  const _id = 2
+          ,_note = 3
+          ,_type = 4
+          ,_primary = 5
+          ,_foreign = 6
+          ,_toTable = 7
+          ,_default = 9
+          ,_noAllowNull = 10
+          ,_unique = 11
+          ,_index = 12
+          ,_middle = 13
+  ;
+  let assArr = [], tableName;
+  for(let i = 0, len = files.length; i < len; i++){
+    let data = files[i].data;
+    data.shift();
+    tableName = data[0][3]
+//    if(i==3)console.log('data: ',data)
+%>
+  const <%- tableName %> = sequelize.define("<%- tableName %>", {
+  <%
+  let fieldArr = data.slice(2, data.length);
+  //foreignFlag:true => 对于非中间表需要计算外键
+  //foreignFlag:false => 对于中间表不需要计算外键
+  let generator = (foreignFlag)=>{
+    for(let j = 0, _len = fieldArr.length; j < _len; j++){
+      let field = fieldArr[j];
+
+      //当id存在且不为createdAt、updatedAt时才能继续
+      if(common.isExist(field[_id]) && ['createdAt','updatedAt'].indexOf(field[_id]) == -1 ){
+        //当不为外键时
+        if(field[_foreign] !== '√'){%>  <%-field[_id] %>: {type: Sequelize.<%- field[_type] %>,<% /*主键时*/if(field[_primary] == '√'){ %> primaryKey: true, <%} %><% /*有默认值时*/if(common.isExist(field[_default])){ %> defaultValue: <%- field[_default] %>, <%}%><% /*不允许为空时*/if(field[_noAllowNull] == '√'){ %> allowNull: false, <%} %><% /*独一unique时*/if(field[_unique] == '√'){ %> unique: true, <%} %>}, //<%- field[_note] %>
+  <%}else if(foreignFlag === true){
+        //当为外键时，将对应的语句push入assArr关联数组中
+        let temp1 = `models.${tableName}.belongsTo(models.${field[_toTable]},{foreignKey:'${field[_id]}'});`;
+        let temp2 = `models.${field[_toTable]}.hasMany(models.${tableName},{foreignKey:'${field[_id]}'});`;
+        assArr = assArr.concat([temp1,temp2]);
+        assArr.push('' +
+                '')
+        }
+      }
+    }
+  }
+  let cIndex = ()=>{
+    for(let j = 0, _len = fieldArr.length; j < _len; j++) {
+      let field = fieldArr[j];
+
+      //当id存在，且不为createdAt、updatedAt、且不为外键、且index存在才能继续
+      if(common.isExist(field[_id])
+        && ['createdAt','updatedAt'].indexOf(field[_id]) == -1
+        && field[_foreign] !== '√'
+        && field[_index] === '√'
+      ){%>{method: 'BTREE',fields: ['<%= field[_id] %>']},
+      <%}
+    }
+  }
+    //当不是中间表时
+    if(data[0][_middle] !== '中间表'){
+      generator(true)
+    }else{
+      //为中间表时
+      let tableArr = tableName.split('_')
+      let temp1 = `models.${tableArr[0]}.belongsToMany(models.${tableArr[1]},{through:'${tableName}'});`;
+      let temp2 = `models.${tableArr[1]}.belongsToMany(models.${tableArr[0]},{through:'${tableName}'});`;
+      assArr.push(temp1);
+      assArr.push(temp2);
+      assArr.push('' +
+              '')
+      generator(false)
+    }
+  %>
+  },{
+    freezeTableName: true,
+    indexes:[
+      <%cIndex()%>
+    ]
+  });
+<% }
+cb(assArr) %>};

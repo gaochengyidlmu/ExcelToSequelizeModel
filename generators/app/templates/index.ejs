@@ -1,0 +1,25 @@
+const
+  fs = require("fs")
+  ,path = require("path")
+  ,Sequelize = require("sequelize")
+  ,config = require("../config")
+  ,association = require("./association")
+;
+
+let sequelize = new Sequelize(config.mysql.database, config.mysql.user, config.mysql.password, config.mysql);
+
+let db = {};
+
+fs.readdirSync(__dirname).filter(function(file) {
+  return (file.endWith(".js")) && (file !== "index.js") && (file !== "association.js");
+}).forEach(function(file) {
+  let model;
+  return model = sequelize["import"](path.join(__dirname, file));
+});
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+db.models = sequelize.models;
+association.buildAssociation(db.models);
+
+module.exports = db;
