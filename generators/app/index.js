@@ -6,7 +6,7 @@ const
   ,ejs = require('ejs')
   ,process = require('process')
   ,xlsx = require('node-xlsx')
-  ,common = require('../../common')
+  ,common = require('common')
 ;
 
 module.exports = class extends Generator {
