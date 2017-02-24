@@ -28,6 +28,7 @@ module.exports = class extends Generator {
         name: 'excelPath',
         message: 'excel文件的路径?'
       }
+
     ];
 
     return this.prompt(prompts).then(function (props) {
