@@ -12,7 +12,7 @@ let sequelize = new Sequelize(config.mysql.database, config.mysql.user, config.m
 let db = {};
 
 fs.readdirSync(__dirname).filter(function(file) {
-  return (file.endWith(".js")) && (file !== "index.js") && (file !== "association.js");
+  return (file.endsWith(".js")) && (file !== "index.js") && (file !== "association.js");
 }).forEach(function(file) {
   let model;
   return model = sequelize["import"](path.join(__dirname, file));
