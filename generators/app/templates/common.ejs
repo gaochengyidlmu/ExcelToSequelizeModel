@@ -61,7 +61,7 @@ module.exports = (sequelize)=>{
         && field[_foreign] !== '√'
         && field[_index] === '√'
       ){%>{method: 'BTREE',fields: ['<%= field[_id] %>']},
-      <%}
+        <%}
     }
   }
     //当不是中间表时
@@ -78,7 +78,7 @@ module.exports = (sequelize)=>{
               '')
       generator(false)
     }
-  %>
+  %>},{
     freezeTableName: true,
     indexes:[
       <%cIndex()%>
