@@ -39,7 +39,7 @@ module.exports = (sequelize)=>{
       //当id存在且不为createdAt、updatedAt时才能继续
       if(common.isExist(field[_id]) && ['createdAt','updatedAt'].indexOf(field[_id]) == -1 ){
         //当不为外键时
-        if(field[_foreign] !== '√'){%>  <%-field[_id] %>: {type: Sequelize.<%- field[_type] %>,<% /*主键时*/if(field[_primary] == '√'){ %> primaryKey: true,<% if(field[_type]==='INTEGER'){%> autoIncrement: true ,<%}} %><% /*有默认值时*/if(common.isExist(field[_default])){ %> defaultValue: <%- field[_default] %>, <%}%><% /*不允许为空时*/if(field[_noAllowNull] == '√'){ %> allowNull: false, <%} %><% /*独一unique时*/if(field[_unique] == '√'){ %> unique: true, <%} %>}, //<%- field[_note] %>
+        if(field[_foreign] !== '√'){%>  <%-field[_id] %>: {type: Sequelize.<%- field[_type] %>,<% /*主键时*/if(field[_primary] == '√'){ %> primaryKey: true,<% if(field[_type]==='INTEGER'){%> autoIncrement: true ,<%}} %><% /*有默认值时*/if(common.isExist(field[_default])){ %> defaultValue: <%- field[_default] %>, <%}%><% /*不允许为空时*/if(field[_noAllowNull] == '√'){ %> allowNull: false, <%} %><% /*独一unique时*/if(field[_unique] == '√'){ %> unique: true, <%} %>}, //<%- field[_note] %><%- '，' + field[_middle] %>
   <%}else if(foreignFlag === true){
         //当为外键时，将对应的语句push入assArr关联数组中
         let temp1 = `models.${tableName}.belongsTo(models.${field[_toTable]},{foreignKey:'${field[_id]}'});`;
