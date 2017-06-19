@@ -4,6 +4,7 @@ const
   , de = require('debug')('dbmodles:error')
   , config = require('../config')
   , Sequelize = require('sequelize')
+  , cfg = require('../config/appconfig/args')
   ;
 
 module.exports = (sequelize)=>{
@@ -20,9 +21,10 @@ module.exports = (sequelize)=>{
           ,_unique = 11
           ,_index = 12
           ,_readOnly = 13
-          ,_middle = 14
-          ,_middle1 = 15
-          ,_middle2 = 16
+          ,_values = 14
+          ,_middle = 15
+          ,_middle1 = 16
+          ,_middle2 = 17
   ;
   let assArr = [], tableName;
   for(let i = 0, len = files.length; i < len; i++){
@@ -43,7 +45,7 @@ module.exports = (sequelize)=>{
       //当id存在且不为createdAt、updatedAt时才能继续
       if(common.isExist(field[_id]) && ['createdAt','updatedAt'].indexOf(field[_id]) == -1 ){
         //当不为外键时
-        if(field[_foreign] !== '√'){%>  <%-field[_id] %>: {type: Sequelize.<%- field[_type] %>,<% /*主键时*/if(field[_primary] == '√'){ %> primaryKey: true,<% if(field[_type]==='INTEGER'){%> autoIncrement: true ,<%}} %><% /*有默认值时*/if(common.isExist(field[_default])){ %> defaultValue: <%- field[_default] %>, <%}%><% /*不允许为空时*/if(field[_noAllowNull] == '√'){ %> allowNull: false, <%} %><% /*独一unique时*/if(field[_unique] == '√'){ %> unique: true, <%} %><% /*联合unique时*/if(field[_unique] != '√' && common.isExist(field[_unique])){ %> unique: '<%= field[_unique]%>', <%} %><% /*只读，不用编辑时*/if(field[_readOnly] == '√'){ %> readOnly: true, <%} %>}, //<%- field[_note] %>，<%- field[_middle] %>
+        if(field[_foreign] !== '√'){%>  <%-field[_id] %>: {type: Sequelize.<%- field[_type] %> <%/* ENUM 的值 */ if (field[_type] === 'ENUM') { %>, values: Object.keys(<%- field[_values]%>) <% }%>,<% /*主键时*/if(field[_primary] == '√'){ %> primaryKey: true,<% if(field[_type]==='INTEGER'){%> autoIncrement: true ,<%}} %><% /*有默认值时*/if(common.isExist(field[_default])){ %> defaultValue: <%- field[_default] %>, <%}%><% /*不允许为空时*/if(field[_noAllowNull] == '√'){ %> allowNull: false, <%} %><% /*独一unique时*/if(field[_unique] == '√'){ %> unique: true, <%} %><% /*联合unique时*/if(field[_unique] != '√' && common.isExist(field[_unique])){ %> unique: '<%= field[_unique]%>', <%} %><% /*只读，不用编辑时*/if(field[_readOnly] == '√'){ %> readOnly: true, <%} %>}, //<%- field[_note] %>，<%- field[_middle] %>
   <%}else if(foreignFlag === true){
         //当为外键时，将对应的语句push入assArr关联数组中
         let temArr = [];
