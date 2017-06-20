@@ -1,40 +1,81 @@
 const
-  uuid = require('uuid')
-  , dl = require('debug')('dbmodles:log')
-  , de = require('debug')('dbmodles:error')
-  , config = require('../config')
-  , Sequelize = require('sequelize')
+    Sequelize = require('sequelize')
   , cfg = require('../config/appconfig/args')
   ;
 
 module.exports = (sequelize)=>{
 <%
-  const _id = 2
-          ,_note = 3
-          ,_type = 4
-          ,_primary = 5
-          ,_foreign = 6
-          ,_toTable = 7
-          ,_description = 8
-          ,_default = 9
-          ,_noAllowNull = 10
-          ,_unique = 11
-          ,_index = 12
-          ,_readOnly = 13
-          ,_values = 14
-          ,_middle = 15
-          ,_middle1 = 16
-          ,_middle2 = 17
-  ;
+
   let assArr = [], tableName;
   for(let i = 0, len = files.length; i < len; i++){
     let data = files[i].data;
     data.shift();
     tableName = data[0][3]
+
 //    if(i==3)console.log('data: ',data)
 %>
   const <%- tableName %> = sequelize.define("<%- tableName %>", {
   <%
+      let _id, _note, _type, _primary, _foreign, _toTable, _scopeField, _description, _default, _noAllowNull, _unique, _index, _readOnly, _values, _middle, _middle1, _middle2 ;
+
+      for (let titleInx = 1, titleLen = data[1].length; titleInx < titleLen; titleInx++){
+
+          switch (  data[1][titleInx]){
+              case '字段名':
+                  _id = titleInx;
+                  break;
+              case '字段描述':
+                  _note = titleInx;
+                  break;
+              case '字段类型':
+                  _type = titleInx;
+                  break;
+              case '主键':
+                  _primary = titleInx;
+                  break;
+              case '外键':
+                  _foreign = titleInx;
+                  break;
+              case '对应表':
+                  _toTable = titleInx;
+                  break;
+              case 'as':
+                  _scopeField = titleInx;
+                  break;
+              case '示例':
+                  _description = titleInx;
+                  break;
+              case '默认值':
+                  _default = titleInx;
+                  break;
+              case '必填项':
+                  _noAllowNull = titleInx;
+                  break;
+              case 'unique':
+                  _unique = titleInx;
+                  break;
+              case 'index':
+                  _index = titleInx;
+                  break;
+              case 'readOnly':
+                  _readOnly = titleInx;
+                  break;
+              case 'ENUM-Values':
+                  _values = titleInx;
+                  break;
+              case '备注':
+                  _middle = titleInx;
+                  break;
+              case '创建人':
+                  _middle1 = titleInx;
+                  break;
+              case '创建时间':
+                  _middle2 = titleInx;
+                  break;
+          }
+      }
+
+
   let fieldArr = data.slice(2, data.length);
   //foreignFlag:true => 对于非中间表需要计算外键
   //foreignFlag:false => 对于中间表不需要计算外键
@@ -48,15 +89,30 @@ module.exports = (sequelize)=>{
         if(field[_foreign] !== '√'){%>  <%-field[_id] %>: {type: Sequelize.<%- field[_type] %> <%/* ENUM 的值 */ if (field[_type] === 'ENUM') { %>, values: Object.keys(<%- field[_values]%>) <% }%>,<% /*主键时*/if(field[_primary] == '√'){ %> primaryKey: true,<% if(field[_type]==='INTEGER'){%> autoIncrement: true ,<%}} %><% /*有默认值时*/if(common.isExist(field[_default])){ %> defaultValue: <%- field[_default] %>, <%}%><% /*不允许为空时*/if(field[_noAllowNull] == '√'){ %> allowNull: false, <%} %><% /*独一unique时*/if(field[_unique] == '√'){ %> unique: true, <%} %><% /*联合unique时*/if(field[_unique] != '√' && common.isExist(field[_unique])){ %> unique: '<%= field[_unique]%>', <%} %><% /*只读，不用编辑时*/if(field[_readOnly] == '√'){ %> readOnly: true, <%} %>}, //<%- field[_note] %>，<%- field[_middle] %>
   <%}else if(foreignFlag === true){
         //当为外键时，将对应的语句push入assArr关联数组中
-        let temArr = [];
-        temArr[0] = `models.${tableName}.belongsTo(models.${field[_toTable]},{foreignKey:{name: '${field[_id]}'`;
-        temArr[1] = `models.${field[_toTable]}.hasMany(models.${tableName},{foreignKey:{name: '${field[_id]}'`;
 
-        let addStr = '}});';
+
+        let temArr = [];
+        temArr[0] = `models.${tableName}.belongsTo(models.${field[_toTable]}, {foreignKey: {name: '${field[_id]}'`;
+        temArr[1] = `models.${field[_toTable]}.hasMany(models.${tableName}, {foreignKey: {name: '${field[_id]}'`;
+
+        let addStr = '});';
         /*为必选项时*/
-        if(field[_noAllowNull] == '√') addStr = `, allowNull: false` + addStr;
+        if(field[_noAllowNull] == '√') {
+            temArr[0] += `, allowNull: false`;
+            temArr[1] += `, allowNull: false`;
+        }
         /*只读，不用编辑时*/
-        if(field[_readOnly] == '√') addStr = `, readOnly : true` + addStr;
+        if(field[_readOnly] == '√') {
+            temArr[0] += `, readOnly : true`;
+            temArr[1] += `, readOnly : true`;
+        }
+
+        if (common.isExist(field[_scopeField])){
+            temArr[0] += `}, constraints: false, as: '${field[_toTable]}'`
+            temArr[1] += `}, constraints: false, scope: { ${field[_scopeField]}: '${field[_toTable]}'}`
+        }else{
+          addStr = '}' + addStr;
+        }
 
         temArr[0] += addStr;
         temArr[1] += addStr;
@@ -64,7 +120,8 @@ module.exports = (sequelize)=>{
         assArr = assArr.concat(temArr);
         assArr.push('' +
                 '')
-        }
+
+      }
       }
     }
   }

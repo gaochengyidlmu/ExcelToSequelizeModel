@@ -4,7 +4,6 @@ const
   ,Sequelize = require("sequelize")
   ,config = require("../config")
   ,association = require("./association")
-  ,util = require("../component/util")
 ;
 
 let sequelize = new Sequelize(config.mysql.database, config.mysql.user, config.mysql.password, config.mysql);
