@@ -46,13 +46,14 @@ module.exports = class extends Generator {
     const files = xlsx.parse(this.props.excelPath);
     files.shift();
 
-    console.log('files: ,files');
+    // console.log('files: ',files);
+    console.log('files: ',files[0].data[2]);
 
     let indexTemp = fs.readFileSync(this.templatePath('index.ejs'), 'utf8');
     indexTemp = ejs.render(indexTemp, {});
     fs.writeFileSync(this.destinationPath('index.js'),indexTemp);
 
-    let commonTemp = fs.readFileSync(this.templatePath('common.ejs'), 'utf8');
+    let commonTemp = fs.readFileSync(this.templatePath('models.ejs'), 'utf8');
     let assArr = [];
     commonTemp = ejs.render(commonTemp, {
       files: files,
@@ -62,7 +63,7 @@ module.exports = class extends Generator {
       }
     });
     console.log('assArr: ',assArr);
-    fs.writeFileSync(this.destinationPath('common.js'),commonTemp);
+    fs.writeFileSync(this.destinationPath('models.js'),commonTemp);
 
     let assTemp = fs.readFileSync(this.templatePath('association.ejs'), 'utf8');
     assTemp = ejs.render(assTemp, {
