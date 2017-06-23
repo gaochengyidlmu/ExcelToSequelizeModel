@@ -72,7 +72,4 @@ module.exports = class extends Generator {
     fs.writeFileSync(this.destinationPath('association.js'),assTemp);
   }
 
-  install() {
-    this.installDependencies();
-  }
 };
