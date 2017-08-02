@@ -26,7 +26,7 @@ module.exports = class extends Generator {
       {
         type: 'input',
         name: 'excelPath',
-        message: 'excel文件的路径?'
+        message: "excel文件的路径(多个文件以','分隔)?"
       }
 
     ];
@@ -71,6 +71,7 @@ module.exports = class extends Generator {
       assArr: assArr
     });
     fs.writeFileSync(this.destinationPath('association.js'),assTemp);
+    this.log('Success!')
   }
 
 };
