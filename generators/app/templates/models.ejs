@@ -23,7 +23,7 @@ module.exports = (sequelize)=>{
 
       for (let titleInx = 1, titleLen = data[1].length; titleInx < titleLen; titleInx++){
 
-          switch (  data[1][titleInx]){
+          switch (data[1][titleInx]){
               case '字段名':
                   _id = titleInx;
                   break;
@@ -43,6 +43,10 @@ module.exports = (sequelize)=>{
                   _toTable = titleInx;
                   break;
               case 'As':
+                  _As = titleInx;
+                  break;
+              // 兼容 as
+              case 'as':
                   _As = titleInx;
                   break;
               case 'scopeField':
