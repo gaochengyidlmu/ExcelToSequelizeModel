@@ -7,6 +7,7 @@ const
   ,process = require('process')
   ,xlsx = require('node-xlsx')
   ,common = require('./common')
+  ,path = require('path')
 ;
 
 module.exports = class extends Generator {
@@ -57,9 +58,12 @@ module.exports = class extends Generator {
 
     let commonTemp = fs.readFileSync(this.templatePath('models.ejs'), 'utf8');
     let assArr = [];
+    let cfgFileName = common.getCfgFileName(path.dirname(this.destinationPath()));
+
     commonTemp = ejs.render(commonTemp, {
-      files: files,
-      common: common,
+      files,
+      common,
+      cfgFileName,
       cb: function (data) {
         assArr = data
       }
