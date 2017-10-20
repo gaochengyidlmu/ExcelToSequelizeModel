@@ -5,7 +5,6 @@ const Sequelize = require('sequelize')
 , association = require('./association');
 
 let dbConfig = config.mysql;
-let db = {};
 let sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig.options);
 
 fs.readdirSync(__dirname, 'utf8')
@@ -18,8 +17,7 @@ fs.readdirSync(__dirname, 'utf8')
 let models = sequelize.models;
 association(models);
 
-db.models = models;
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+exports.models = models;
+exports.sequelize = sequelize;
+exports.Sequelize = Sequelize;
 
-module.exports = db;
