@@ -2,7 +2,8 @@ const Sequelize = require('sequelize')
 , fs = require('fs')
 , config = require('config')
 , path = require('path')
-, association = require('./association');
+, association = require('./association')
+, modelWrapper = require('ljx-sequelize-wrapper')
 
 let dbConfig = config.mysql;
 let sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig.options);
@@ -15,9 +16,15 @@ fs.readdirSync(__dirname, 'utf8')
 });
 
 let models = sequelize.models;
+let Models = {};
+
+for (let key in models) {
+  Models[key] = new modelWrapper(models, key)
+}
 association(models);
 
 exports.models = models;
+exports.Models = Models;
 exports.sequelize = sequelize;
 exports.Sequelize = Sequelize;
 
