@@ -96,14 +96,25 @@ module.exports = (sequelize)=>{
       //当id存在且不为createdAt、updatedAt时才能继续
       if(common.isExist(field[_id]) && ['createdAt','updatedAt'].indexOf(field[_id]) == -1 ){
         //当不为外键时
-        if(field[_foreign] !== '√'){%>  <%-field[_id] %>: {type: Sequelize.<%- field[_type] %> <%/* ENUM 的值 */ if (field[_type] === 'ENUM') { %>, values: Object.values(<%- field[_values]%>) <% }%>,<% /*主键时*/if(field[_primary] == '√'){ %> primaryKey: true,<% if(field[_type]==='INTEGER'){%> autoIncrement: true ,<%}} %><% /*有默认值时*/if(common.isExist(field[_default])){ %> defaultValue: <%- field[_default] %>, <%}%><% /*不允许为空时*/if(field[_noAllowNull] == '√'){ %> allowNull: false, <%} %><% /*独一unique时*/if(field[_unique] == '√'){ %> unique: true, <%} %><% /*联合unique时*/if(field[_unique] != '√' && common.isExist(field[_unique])){ %> unique: '<%= field[_unique]%>', <%} %><% /*只读，不用编辑时*/if(field[_readOnly] == '√'){ %> readOnly: true, <%} %><% /*范例*/if(common.isExist(field[_description])){ console.log('description: ', field[_description])%> _description: '<%=field[_description]%>', <%} %>}, // <%- field[_note] %>，<%- field[_middle] %>
+        if(field[_foreign] !== '√' && field[_foreign] !== 'one'){%>  <%-field[_id] %>: {type: Sequelize.<%- field[_type] %> <%/* ENUM 的值 */ if (field[_type] === 'ENUM') { %>, values: Object.values(<%- field[_values]%>) <% }%>,<% /*主键时*/if(field[_primary] == '√'){ %> primaryKey: true,<% if(field[_type]==='INTEGER'){%> autoIncrement: true ,<%}} %><% /*有默认值时*/if(common.isExist(field[_default])){ %> defaultValue: <%- field[_default] %>, <%}%><% /*不允许为空时*/if(field[_noAllowNull] == '√'){ %> allowNull: false, <%} %><% /*独一unique时*/if(field[_unique] == '√'){ %> unique: true, <%} %><% /*联合unique时*/if(field[_unique] != '√' && common.isExist(field[_unique])){ %> unique: '<%= field[_unique]%>', <%} %><% /*只读，不用编辑时*/if(field[_readOnly] == '√'){ %> readOnly: true, <%} %><% /*范例*/if(common.isExist(field[_description])){ console.log('description: ', field[_description])%> _description: '<%=field[_description]%>', <%} %>}, // <%- field[_note] %>，<%- field[_middle] %>
   <%}else {
         //当为外键时，将对应的语句push入assArr关联数组中
+        // 判断，是一对多还是一对一
+        let operation1, operation2
+
+        if (field[_foreign] === '√') {
+          operation1 = 'belongsTo'
+          operation2 = 'hasMany'
+        }
+        if (field[_foreign] === 'one') {
+          operation1 = 'belongsTo'
+          operation2 = 'hasOne'
+        }
 
 
         let temArr = [];
-        temArr[0] = `models.${tableName}.belongsTo(models.${field[_toTable]}, {foreignKey: {name: '${field[_id]}'`;
-        temArr[1] = `models.${field[_toTable]}.hasMany(models.${tableName}, {foreignKey: {name: '${field[_id]}'`;
+        temArr[0] = `models.${tableName}.${operation1}(models.${field[_toTable]}, {foreignKey: {name: '${field[_id]}'`;
+        temArr[1] = `models.${field[_toTable]}.${operation2}(models.${tableName}, {foreignKey: {name: '${field[_id]}'`;
 
         let addStr = '});';
         if (common.isExist(field[_As])){
