@@ -167,8 +167,8 @@ module.exports = (sequelize)=>{
       generator()
     }else{
       //为中间表时
-      let temp1 = `models.${data[0][_middle1]}.belongsToMany(models.${data[0][_middle2]}, {through: '${tableName}'});`;
-      let temp2 = `models.${data[0][_middle2]}.belongsToMany(models.${data[0][_middle1]}, {through: '${tableName}'});`;
+      let temp1 = `models.${data[0][_middle1]}.belongsToMany(models.${data[0][_middle2]}, {through: '${tableName}', unique: false});`;
+      let temp2 = `models.${data[0][_middle2]}.belongsToMany(models.${data[0][_middle1]}, {through: '${tableName}', unique: false});`;
       assArr.push(temp1);
       assArr.push(temp2);
       assArr.push('' +
