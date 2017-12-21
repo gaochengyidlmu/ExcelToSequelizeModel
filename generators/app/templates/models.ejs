@@ -117,11 +117,6 @@ module.exports = (sequelize)=>{
         temArr[1] = `models.${field[_toTable]}.${operation2}(models.${tableName}, {foreignKey: {name: '${field[_id]}'`;
 
         let addStr = '});';
-        if (common.isExist(field[_As])){
-          temArr[0] += `, as: '${field[_As]}'`;
-          let asStr = operation2 === 'hasMany' ? pluralize.plural(field[_As]) : field[_As]
-          temArr[1] += `, as: '${asStr}'`;
-        }
         /*为必选项时*/
         if(field[_noAllowNull] == '√') {
             temArr[0] += `, allowNull: false`;
@@ -137,7 +132,15 @@ module.exports = (sequelize)=>{
             temArr[0] += `}, constraints: false, as: '${field[_toTable]}'`
             temArr[1] += `}, constraints: false, scope: { ${field[_scopeField]}: '${field[_toTable]}'}`
         }else{
-          addStr = `}` + addStr;
+          temArr[0] += '}';
+          temArr[1] += '}';
+        }
+
+
+        if (common.isExist(field[_As])){
+          temArr[0] += `, as: '${field[_As]}'`;
+          let asStr = operation2 === 'hasMany' ? pluralize.plural(field[_As]) : field[_As]
+          temArr[1] += `, as: '${asStr}'`;
         }
 
         temArr[0] += addStr;
