@@ -118,7 +118,9 @@ module.exports = (sequelize)=>{
 
         let addStr = '});';
         if (common.isExist(field[_As])){
-          addStr = `, as: '${field[_As]}'` + addStr
+          temArr[0] += `, as: '${field[_As]}'`;
+          let asStr = operation2 === 'hasMany' ? pluralize.plural(field[_As]) : field[_As]
+          temArr[1] += `, as: '${asStr}'`;
         }
         /*为必选项时*/
         if(field[_noAllowNull] == '√') {

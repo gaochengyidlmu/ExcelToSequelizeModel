@@ -7,6 +7,7 @@ const
   ,process = require('process')
   ,xlsx = require('node-xlsx')
   ,common = require('./common')
+  ,pluralize = require('pluralize')
   ,path = require('path')
 ;
 
@@ -64,6 +65,7 @@ module.exports = class extends Generator {
       files,
       common,
       cfgFileName,
+      pluralize,
       cb: function (data) {
         assArr = data
       }
